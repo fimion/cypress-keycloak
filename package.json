@@ -1,0 +1,17 @@
+{
+  "name": "cypress-keycloak",
+  "version": "1.0.0",
+  "scripts": {
+    "fix": "prettier index.js",
+    "doc": "jsdoc -c jsdoc.config.js"
+  },
+  "dependencies": {
+    "cypress": ">3.8.3"
+  },
+  "devDependencies": {
+    "prettier": "^2.0.5",
+    "jsdoc": "^3.6.4",
+    "minami": "^1.2.3"
+  },
+  "main": "index.js"
+}
