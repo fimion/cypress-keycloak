@@ -44,6 +44,7 @@ function createUUID() {
  * @param {string} [options.defaultPassword=""] - the default password to log in with
  * @param {number} [options.additionalWait=0] - add wait time before login and logout if you need to delay things
  * @param {boolean} [options.registerCommands=true] - register commands automatically or not.
+ * @param {boolean} [options.blockBeforeUnload=true] - keycloak does some stuff onbeforeunload that can mess with cypress. Turn this on or off.
  * @return {object.<KeycloakMethods>}
  */
 function cypressKeycloak(url, realm, clientId, options) {
@@ -79,6 +80,7 @@ function cypressKeycloak(url, realm, clientId, options) {
       defaultUser: "",
       defaultPassword: "",
       registerCommands: true,
+      blockBeforeUnload: true,
     },
     options
   );
@@ -228,6 +230,24 @@ function cypressKeycloak(url, realm, clientId, options) {
     Cypress.Commands.add("keycloakLogin", keycloakLogin);
     Cypress.Commands.add("keycloakVisit", keycloakVisit);
     Cypress.Commands.add("keycloakLogout", keycloakLogout);
+  }
+
+  if (OPTS.blockBeforeUnload) {
+    Cypress.on("window:before:load", function (win) {
+      const original = win.EventTarget.prototype.addEventListener;
+
+      win.EventTarget.prototype.addEventListener = function () {
+        if (arguments && arguments[0] === "beforeunload") {
+          return;
+        }
+        return original.apply(this, arguments);
+      };
+
+      Object.defineProperty(win, "onbeforeunload", {
+        get: function () {},
+        set: function () {},
+      });
+    });
   }
 
   return {
